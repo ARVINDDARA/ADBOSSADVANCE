@@ -13,12 +13,15 @@
     }
 
     body {
-      height: 100vh;
+      min-height: 100vh;
       background: url('https://source.unsplash.com/1600x900/?nature,abstract') no-repeat center center/cover;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: Arial, sans-serif;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
     }
 
     .glass-card {
@@ -30,6 +33,8 @@
       padding: 40px 60px;
       text-align: center;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
     }
 
     .glass-card h1 {
@@ -52,6 +57,14 @@
     .glass-card button:hover {
       background: #0072ff;
     }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
   </style>
 
   <!-- Google Analytics Tracking Code -->
@@ -65,15 +78,32 @@
 
 </head>
 <body>
+
   <div class="glass-card">
     <h1>Best Filter Effect</h1>
-    <button onclick="openSite()">SHOW SITE</button>
+    <button onclick="showIframe()">SHOW SITE</button>
+  </div>
+
+  <div id="iframe-container" style="width: 100%; max-width: 900px; margin-top: 20px; display: none;">
+    <iframe id="site-frame" src=""></iframe>
   </div>
 
   <script>
-    function openSite() {
-      window.location.href = "https://xhamster19.com/categories/indian/hd";
+    function showIframe() {
+      const iframeContainer = document.getElementById('iframe-container');
+      const iframe = document.getElementById('site-frame');
+      
+      iframe.src = "https://xhamster19.com/categories/indian/hd"; // Full URL with https://
+      iframeContainer.style.display = "block";
+
+      // Track button click in GA
+      gtag('event', 'external_site_open', {
+        'event_category': 'engagement',
+        'event_label': 'AdBoss Embedded',
+        'value': 1
+      });
     }
   </script>
+
 </body>
 </html>

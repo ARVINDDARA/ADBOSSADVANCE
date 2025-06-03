@@ -27,24 +27,44 @@
     }
   </style>
 
-  <!-- Google Analytics (optional) -->
+  <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNBWGF5ZF0"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-TNBWGF5ZF0');
+
+    // Custom event to track page visit
+    gtag('event', 'page_view', {
+      page_title: 'Redirect Page',
+      page_path: '/redirect'
+    });
   </script>
 
 </head>
 <body>
   <h1>Redirecting you to the best content...</h1>
   <p>If the page does not redirect automatically, please click the link below:</p>
-  <a href="https://hamster19.com/categories/indian/hd" target="_blank" rel="noopener noreferrer">Go to Site</a>
+  <a id="manual-link" href="https://xhamster19.com/categories/indian/hd" target="_blank" rel="noopener noreferrer">Go to Site</a>
 
   <script>
-    // Automatically redirect after 2 seconds
+    // Track manual click
+    document.getElementById('manual-link').addEventListener('click', function () {
+      gtag('event', 'manual_click', {
+        event_category: 'Outbound Link',
+        event_label: 'Manual Link Click to xhamster19'
+      });
+    });
+
+    // Track auto-redirect
     setTimeout(() => {
+      gtag('event', 'redirect_to_xhamster19', {
+        event_category: 'Redirect',
+        event_label: 'Auto Redirect to xhamster19'
+      });
+
+      // Then redirect
       window.location.href = "https://xhamster19.com/categories/indian/hd";
     }, 2000);
   </script>

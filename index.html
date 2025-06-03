@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Filter Effect Screen</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: url('https://source.unsplash.com/1600x900/?nature,abstract') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 40px 60px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .glass-card h1 {
+      color: #fff;
+      margin-bottom: 20px;
+      font-size: 32px;
+    }
+
+    .glass-card button {
+      padding: 12px 30px;
+      font-size: 16px;
+      background: #00c6ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .glass-card button:hover {
+      background: #0072ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <h1>Best Filter Effect</h1>
+    <button onclick="openSite()">SHOW SITE</button>
+  </div>
+
+  <script>
+    function openSite() {
+      window.location.href = "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://harishprojects.com/%3Fsrsltid%3DAfmBOoomRrTSpNZkVV7tQ45j_kK_9E4b0A3t0dSSD2VJGtwbtHjgD0TL&ved=2ahUKEwi9yoLdjNWNAxWAia8BHTKOIfoQFnoECFgQAQ&usg=AOvVaw12EZzSyCb03kQ1ePll6AyB";
+    }
+  </script>
+</body>
+</html>

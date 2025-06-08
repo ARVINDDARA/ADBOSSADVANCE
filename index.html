@@ -1,1 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess The Number Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #282c34;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+        }
 
+        .game-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #69bff8;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            color: #41dfff;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #69bff8;
+            border-radius: 8px;
+            font-size: 1.1em;
+            background-color: #3a3f47;
+            color: #ffffff;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #5ffbf1;
+            box-shadow: 0 0 10px rgba(95, 251, 241, 0.5);
+        }
+
+        button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        button#resetButton {
+            background-color: #f44336; /* Red */
+        }
+
+        button#resetButton:hover {
+            background-color: #da190b;
+        }
+
+        #message {
+            margin-top: 25px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #ffe082; /* Light yellow */
+            min-height: 30px; /* Space for message */
+        }
+
+        #attempts {
+            font-size: 1em;
+            color: #bbbbbb;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Guess The Number!</h1>
+        <p>I'm thinking of a number between 1 and 100. Can you guess it?</p>
+        <input type="number" id="guessInput" placeholder="Enter your guess (1-100)">
+        <button id="checkButton">Check My Guess</button>
+        <button id="resetButton">Play Again</button>
+        <p id="message"></p>
+        <p id="attempts">Attempts: 0</p>
+    </div>
+
+    <script>
+        let randomNumber;
+        let attempts = 0;
+        const maxAttempts = 10; // Maximum attempts allowed for a challenge
+
+        const guessInput = document.getElementById('guessInput');
+        const checkButton = document.getElementById('checkButton');
+        const resetButton = document.getElementById('resetButton');
+        const messageDisplay = document.getElementById('message');
+        const attemptsDisplay = document.getElementById('attempts');
+
+        // Function to start a new game
+        function startGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1; // Number between 1 and 100
+            attempts = 0;
+            messageDisplay.textContent = '';
+            attemptsDisplay.textContent = `Attempts: ${attempts}`;
+            guessInput.value = '';
+            guessInput.disabled = false;
+            checkButton.disabled = false;
+            checkButton.textContent = 'Check My Guess';
+            resetButton.style.display = 'none'; // Hide reset button initially
+            guessInput.focus(); // Focus on the input field
+        }
+
+        // Function to handle a guess
+        function checkGuess() {
+            const userGuess = parseInt(guessInput.value);
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                messageDisplay.textContent = 'Please enter a valid number between 1 and 100.';
+                messageDisplay.style.color = '#ff6b6b'; // Red for error
+                return;
+            }
+
+            attempts++;
+            attemptsDisplay.textContent = `Attempts: ${attempts}`;
+
+            if (userGuess === randomNumber) {
+                messageDisplay.textContent = `🎉 Congratulations! You guessed the number ${randomNumber} in ${attempts} attempts! 🎉`;
+                messageDisplay.style.color = '#76ff03'; // Green for win
+                guessInput.disabled = true;
+                checkButton.disabled = true;
+                checkButton.textContent = 'Game Over';
+                resetButton.style.display = 'inline-block'; // Show reset button
+            } else if (userGuess < randomNumber) {
+                messageDisplay.textContent = 'Too low! Try a higher number.';
+                messageDisplay.style.color = '#ffe082'; // Yellow for hint
+            } else {
+                messageDisplay.textContent = 'Too high! Try a lower number.';
+                messageDisplay.style.color = '#ffe082'; // Yellow for hint
+            }
+
+            // Optional: Add a max attempt limit
+            // if (attempts >= maxAttempts && userGuess !== randomNumber) {
+            //     messageDisplay.textContent = `Game Over! You ran out of attempts. The number was ${randomNumber}.`;
+            //     messageDisplay.style.color = '#ff6b6b';
+            //     guessInput.disabled = true;
+            //     checkButton.disabled = true;
+            //     checkButton.textContent = 'Game Over';
+            //     resetButton.style.display = 'inline-block';
+            // }
+
+            guessInput.value = ''; // Clear input for next guess
+        }
+
+        // Event Listeners
+        checkButton.addEventListener('click', checkGuess);
+        resetButton.addEventListener('click', startGame);
+
+        // Allow pressing Enter key to check guess
+        guessInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkGuess();
+            }
+        });
+
+        // Start the game when the page loads
+        startGame();
+    </script>
+
+</body>
+</html>

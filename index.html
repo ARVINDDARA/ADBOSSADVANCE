@@ -3,199 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess The Number Game</title>
+    <title>Predict the Next Color & Number Game</title>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #282c34;
-            color: #ffffff;
+            background-color: #f0f8ff; /* Alice Blue */
+            color: #333;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
-        }
-
-        .game-container {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-            border: 2px solid #69bff8;
-            backdrop-filter: blur(5px);
-        }
-
-        h1 {
-            color: #41dfff;
-            margin-bottom: 25px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        }
-
-        p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
             line-height: 1.6;
         }
-
-        input[type="number"] {
-            width: calc(100% - 22px);
-            padding: 12px;
+        .game-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 700px; /* Increased max-width */
+            width: 100%;
+            border: 1px solid #cce7e0;
+            position: relative;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+        }
+        p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        #score-display, #timer-display {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #007bff;
             margin-bottom: 20px;
-            border: 2px solid #69bff8;
+        }
+        #timer-display {
+            color: #e67e22;
+        }
+        #color-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 7px solid #34495e;
+            margin: 30px auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.5);
+            transition: background-color 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column; /* For color and number */
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+        #color-text {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        #number-text {
+            font-size: 2em;
+            margin-top: 5px;
+        }
+        .options-section {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .options-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .option-button {
+            background-color: #ecf0f1;
+            color: #34495e;
+            padding: 12px 25px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+            min-width: 100px;
+            text-align: center;
+        }
+        .option-button.number-button {
+            min-width: 60px; /* Smaller for numbers */
+            padding: 10px 15px;
+        }
+        .option-button.selected { /* Added for visual feedback */
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .option-button:hover:not(:disabled) {
+            background-color: #3498db;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.25);
+        }
+        .option-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .option-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #cccccc;
+            border-color: #999999;
+        }
+        .bet-input-group {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .bet-input-group label {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .bet-input-group input[type="number"] {
+            width: 100px;
+            padding: 8px 10px;
+            border: 2px solid #3498db;
             border-radius: 8px;
             font-size: 1.1em;
-            background-color: #3a3f47;
-            color: #ffffff;
             text-align: center;
-            outline: none;
-            transition: border-color 0.3s ease;
+            -moz-appearance: textfield; /* Hide arrows for Firefox */
         }
-
-        input[type="number"]:focus {
-            border-color: #5ffbf1;
-            box-shadow: 0 0 10px rgba(95, 251, 241, 0.5);
+        .bet-input-group input[type="number"]::-webkit-outer-spin-button,
+        .bet-input-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
-
-        button {
-            background-color: #4CAF50; /* Green */
+        .bet-button {
+            background-color: #f39c12; /* Orange for bet */
             color: white;
-            padding: 14px 25px;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1.2em;
+            font-size: 1.1em;
+            font-weight: bold;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            margin: 5px;
         }
-
-        button:hover {
-            background-color: #45a049;
+        .bet-button:hover:not(:disabled) {
+            background-color: #e67e22;
             transform: translateY(-2px);
         }
-
-        button#resetButton {
-            background-color: #f44336; /* Red */
+        .bet-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #ccc;
         }
 
-        button#resetButton:hover {
-            background-color: #da190b;
-        }
-
-        #message {
-            margin-top: 25px;
-            font-size: 1.4em;
+        #result-message {
+            margin-top: 30px;
+            font-size: 1.6em;
             font-weight: bold;
-            color: #ffe082; /* Light yellow */
-            min-height: 30px; /* Space for message */
+            min-height: 35px;
+            margin-bottom: 25px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .wrong {
+            color: #e74c3c;
+        }
+        .game-over {
+            color: #c0392b;
+            font-size: 2em;
+            margin-bottom: 10px;
         }
 
-        #attempts {
-            font-size: 1em;
-            color: #bbbbbb;
-            margin-top: 15px;
+        .records-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px dashed #ccc;
+            text-align: left;
+            width: 100%;
+        }
+        .records-section h2 {
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+        #game-records {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fdfdfd;
+        }
+        .record-item {
+            background-color: #e9f5f9;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+            border-left: 5px solid #3498db;
+        }
+        .record-item.correct-bet {
+            border-left-color: #27ae60;
+            background-color: #e6ffe6;
+        }
+        .record-item.wrong-bet {
+            border-left-color: #e74c3c;
+            background-color: #ffe6e6;
+        }
+        .record-item span {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-
     <div class="game-container">
-        <h1>Guess The Number!</h1>
-        <p>I'm thinking of a number between 1 and 100. Can you guess it?</p>
-        <input type="number" id="guessInput" placeholder="Enter your guess (1-100)">
-        <button id="checkButton">Check My Guess</button>
-        <button id="resetButton">Play Again</button>
-        <p id="message"></p>
-        <p id="attempts">Attempts: 0</p>
+        <h1>Predict the Next Color & Number!</h1>
+        <p>A color and number will change every 30 seconds. Predict the next one!</p>
+
+        <p id="timer-display">Next change in: 30s</p>
+        <p id="score-display">Score: 50</p>
+
+        <div id="color-circle">
+            <span id="color-text"></span>
+            <span id="number-text"></span>
+        </div>
+
+        <div class="options-section">
+            <div class="options-group">
+                <button class="option-button" data-type="color" data-value="red">Red</button>
+                <button class="option-button" data-type="color" data-value="blue">Blue</button>
+                <button class="option-button" data-type="color" data-value="pink">Pink</button>
+            </div>
+            <div class="options-group">
+                <button class="option-button number-button" data-type="number" data-value="1">1</button>
+                <button class="option-button number-button" data-type="number" data-value="2">2</button>
+                <button class="option-button number-button" data-type="number" data-value="3">3</button>
+                <button class="option-button number-button" data-type="number" data-value="4">4</button>
+                <button class="option-button number-button" data-type="number" data-value="5">5</button>
+                <button class="option-button number-button" data-type="number" data-value="6">6</button>
+                <button class="option-button number-button" data-type="number" data-value="7">7</button>
+                <button class="option-button number-button" data-type="number" data-value="8">8</button>
+                <button class="option-button number-button" data-type="number" data-value="9">9</button>
+            </div>
+        </div>
+
+        <div class="bet-input-group">
+            <label for="bet-amount">Bet Points:</label>
+            <input type="number" id="bet-amount" value="10" min="1" max="50">
+            <button class="bet-button" id="place-bet-button">Place Bet</button>
+        </div>
+
+        <p id="result-message"></p>
+    </div>
+
+    <div class="records-section">
+        <h2>Game Records</h2>
+        <div id="game-records">
+            <p>No records yet.</p>
+        </div>
     </div>
 
     <script>
-        let randomNumber;
-        let attempts = 0;
-        const maxAttempts = 10; // Maximum attempts allowed for a challenge
+        // Game configuration
+        const STARTING_POINTS = 50;
+        const POINTS_FOR_CORRECT_COLOR = 50;
+        const POINTS_FOR_PINK_BONUS = 100; // Total for Pink: 50 + 100 = 150
+        const POINTS_FOR_CORRECT_NUMBER = 1000;
+        const COLOR_CHANGE_INTERVAL_SECONDS = 30; // Color and number change every 30 seconds
 
-        const guessInput = document.getElementById('guessInput');
-        const checkButton = document.getElementById('checkButton');
-        const resetButton = document.getElementById('resetButton');
-        const messageDisplay = document.getElementById('message');
-        const attemptsDisplay = document.getElementById('attempts');
+        // Color definitions
+        const COLORS = {
+            red: '#e74c3c',   // Alizarin Red
+            blue: '#3498db',  // Peter River Blue
+            pink: '#ff69b4'   // Hot Pink
+        };
 
-        // Function to start a new game
-        function startGame() {
-            randomNumber = Math.floor(Math.random() * 100) + 1; // Number between 1 and 100
-            attempts = 0;
-            messageDisplay.textContent = '';
-            attemptsDisplay.textContent = `Attempts: ${attempts}`;
-            guessInput.value = '';
-            guessInput.disabled = false;
-            checkButton.disabled = false;
-            checkButton.textContent = 'Check My Guess';
-            resetButton.style.display = 'none'; // Hide reset button initially
-            guessInput.focus(); // Focus on the input field
+        // Game state variables
+        let score = STARTING_POINTS;
+        let timeLeftForNextChange = COLOR_CHANGE_INTERVAL_SECONDS;
+        let gameLoopInterval; // Interval for color/number changes
+        let timerCountdownInterval; // Interval for showing countdown
+        let currentPeriod = 0; // Tracks game periods
+
+        let currentDisplayedColor = null; // The color currently in the circle
+        let currentDisplayedNumber = null; // The number currently in the circle
+
+        let nextExpectedColor = null; // The color that will appear after 30 seconds
+        let nextExpectedNumber = null; // The number that will appear after 30 seconds
+
+        // Variables to store the user's *selected* prediction for the current bet
+        let selectedBetType = null; // 'color' or 'number'
+        let selectedBetValue = null; // e.g., 'red' or 5
+
+        // Array to store user's bets for the *current* round
+        let currentRoundBets = []; // { type: 'color'/'number', value: 'red'/5, amount: 10 }
+
+        // Array to store all game records
+        let gameRecords = []; // { period: 1, actualColor: 'red', actualNumber: 5, bets: [], scoreChange: +50 }
+
+        // DOM elements
+        const scoreDisplay = document.getElementById('score-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const colorCircle = document.getElementById('color-circle');
+        const colorText = document.getElementById('color-text');
+        const numberText = document.getElementById('number-text');
+        const resultMessage = document.getElementById('result-message');
+        const gameRecordsContainer = document.getElementById('game-records');
+
+        const allOptionButtons = document.querySelectorAll('.option-button'); // All color and number buttons
+        const colorOptionButtons = document.querySelectorAll('.option-button[data-type="color"]');
+        const numberOptionButtons = document.querySelectorAll('.option-button[data-type="number"]');
+        const betAmountInput = document.getElementById('bet-amount');
+        const placeBetButton = document.getElementById('place-bet-button');
+
+        // --- Utility Functions ---
+
+        function updateDisplay() {
+            scoreDisplay.textContent = `Score: ${score}`;
+            timerDisplay.textContent = `Next change in: ${timeLeftForNextChange}s (Period ${currentPeriod})`;
+            betAmountInput.max = score; // Update max bet amount based on current score
+            // Ensure bet amount is not more than current score and not less than 1 (unless score is 0)
+            betAmountInput.value = Math.min(betAmountInput.value, score > 0 ? score : 0);
+            betAmountInput.value = Math.max(1, betAmountInput.value); // Ensure minimum bet is 1 unless score is 0
+            if (score <= 0 && currentPeriod > 0) { // Only end if game has actually started
+                endGame(); // End game if score drops to 0 or less
+            }
         }
 
-        // Function to handle a guess
-        function checkGuess() {
-            const userGuess = parseInt(guessInput.value);
+        function enableBettingControls() {
+            betAmountInput.disabled = false;
+            placeBetButton.disabled = false; // Enable place bet button
+            allOptionButtons.forEach(button => button.disabled = false); // Enable all prediction buttons
+        }
 
-            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
-                messageDisplay.textContent = 'Please enter a valid number between 1 and 100.';
-                messageDisplay.style.color = '#ff6b6b'; // Red for error
+        function disableBettingControls() {
+            betAmountInput.disabled = true;
+            placeBetButton.disabled = true; // Disable place bet button
+            allOptionButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.remove('selected'); // Remove selected visual on disable
+            });
+            selectedBetType = null; // Clear selected bet
+            selectedBetValue = null; // Clear selected bet
+        }
+
+        function getRandomColorName() {
+            const randomNumber = Math.random();
+            if (randomNumber < 0.45) { // 45% chance for Red
+                return 'red';
+            } else if (randomNumber < 0.90) { // 45% chance for Blue (total 90%)
+                return 'blue';
+            } else { // 10% chance for Pink (rare)
+                return 'pink';
+            }
+        }
+
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 9) + 1; // Random number between 1 and 9
+        }
+
+        function addRecord(record) {
+            gameRecords.push(record);
+            renderRecords();
+        }
+
+        function renderRecords() {
+            gameRecordsContainer.innerHTML = ''; // Clear existing records
+            if (gameRecords.length === 0) {
+                gameRecordsContainer.innerHTML = '<p>No records yet.</p>';
                 return;
             }
 
-            attempts++;
-            attemptsDisplay.textContent = `Attempts: ${attempts}`;
+            // Iterate in reverse to show newest records at the top
+            for (let i = gameRecords.length - 1; i >= 0; i--) {
+                const record = gameRecords[i];
+                const recordItem = document.createElement('div');
+                recordItem.classList.add('record-item');
 
-            if (userGuess === randomNumber) {
-                messageDisplay.textContent = `🎉 Congratulations! You guessed the number ${randomNumber} in ${attempts} attempts! 🎉`;
-                messageDisplay.style.color = '#76ff03'; // Green for win
-                guessInput.disabled = true;
-                checkButton.disabled = true;
-                checkButton.textContent = 'Game Over';
-                resetButton.style.display = 'inline-block'; // Show reset button
-            } else if (userGuess < randomNumber) {
-                messageDisplay.textContent = 'Too low! Try a higher number.';
-                messageDisplay.style.color = '#ffe082'; // Yellow for hint
-            } else {
-                messageDisplay.textContent = 'Too high! Try a lower number.';
-                messageDisplay.style.color = '#ffe082'; // Yellow for hint
+                let betsSummary = '';
+                let betsMadeInRound = false;
+
+                record.bets.forEach(bet => {
+                    betsMadeInRound = true;
+                    if (bet.isCorrect) {
+                        betsSummary += `✔ ${bet.guessedValue.toString().toUpperCase()} (+${bet.pointsWon - bet.amount} net)`;
+                    } else {
+                        betsSummary += `❌ ${bet.guessedValue.toString().toUpperCase()} (-${bet.amount})`;
+                    }
+                    betsSummary += ' | ';
+                });
+
+                if (!betsMadeInRound) {
+                    betsSummary = 'No bets placed.';
+                    recordItem.classList.remove('correct-bet', 'wrong-bet'); // Ensure no specific color
+                } else if (record.scoreChange > 0) {
+                    recordItem.classList.add('correct-bet');
+                } else if (record.scoreChange < 0) {
+                    recordItem.classList.add('wrong-bet');
+                } else {
+                    recordItem.classList.remove('correct-bet', 'wrong-bet'); // Neutral if score change is 0
+                }
+
+                recordItem.innerHTML = `
+                    <span>P${record.period}:</span>
+                    <span>Actual: ${record.actualColor.toUpperCase()} (${record.actualNumber})</span>
+                    <span>Bets: ${betsSummary || 'No bets'}</span>
+                    <span>Net: <span style="color:${record.scoreChange >= 0 ? '#27ae60' : '#e74c3c'}">${record.scoreChange >= 0 ? '+' : ''}${record.scoreChange}</span></span>
+                `;
+                gameRecordsContainer.appendChild(recordItem); // Add new records at the top
             }
-
-            // Optional: Add a max attempt limit
-            // if (attempts >= maxAttempts && userGuess !== randomNumber) {
-            //     messageDisplay.textContent = `Game Over! You ran out of attempts. The number was ${randomNumber}.`;
-            //     messageDisplay.style.color = '#ff6b6b';
-            //     guessInput.disabled = true;
-            //     checkButton.disabled = true;
-            //     checkButton.textContent = 'Game Over';
-            //     resetButton.style.display = 'inline-block';
-            // }
-
-            guessInput.value = ''; // Clear input for next guess
         }
 
-        // Event Listeners
-        checkButton.addEventListener('click', checkGuess);
-        resetButton.addEventListener('click', startGame);
+        // --- Game Logic Functions ---
 
-        // Allow pressing Enter key to check guess
-        guessInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                checkGuess();
+        function checkBetsAndResolveRound() {
+            let roundScoreChange = 0;
+            let betsMadeInRound = false;
+
+            currentRoundBets.forEach(bet => {
+                betsMadeInRound = true;
+                
+                // Deduct bet amount when the round resolves
+                score -= bet.amount; 
+
+                let betOutcome = {
+                    type: bet.type,
+                    guessedValue: bet.guessedValue,
+                    amount: bet.amount,
+                    pointsWon: 0,
+                    isCorrect: false
+                };
+
+                if (bet.type === 'color') {
+                    if (bet.guessedValue === nextExpectedColor) {
+                        let pointsWon = POINTS_FOR_CORRECT_COLOR;
+                        if (nextExpectedColor === 'pink') {
+                            pointsWon += POINTS_FOR_PINK_BONUS;
+                        }
+                        score += pointsWon;
+                        roundScoreChange += (pointsWon - bet.amount);
+                        betOutcome.pointsWon = pointsWon;
+                        betOutcome.isCorrect = true;
+                    } else {
+                        roundScoreChange -= bet.amount; // Already deducted, so just track loss
+                    }
+                } else if (bet.type === 'number') {
+                    if (parseInt(bet.guessedValue) === nextExpectedNumber) {
+                        score += POINTS_FOR_CORRECT_NUMBER;
+                        roundScoreChange += (POINTS_FOR_CORRECT_NUMBER - bet.amount);
+                        betOutcome.pointsWon = POINTS_FOR_CORRECT_NUMBER;
+                        betOutcome.isCorrect = true;
+                    } else {
+                        roundScoreChange -= bet.amount; // Already deducted, so just track loss
+                    }
+                }
+                // Update the original bet object in currentRoundBets for the record
+                bet.isCorrect = betOutcome.isCorrect;
+                bet.pointsWon = betOutcome.pointsWon;
+            });
+
+            // Update result message based on round's bets
+            if (betsMadeInRound) {
+                if (roundScoreChange > 0) {
+                    resultMessage.textContent = `Well played! You gained ${roundScoreChange} points this period.`;
+                    resultMessage.classList.remove('wrong');
+                    resultMessage.classList.add('correct');
+                } else if (roundScoreChange < 0) {
+                    resultMessage.textContent = `Tough luck! You lost ${Math.abs(roundScoreChange)} points this period.`;
+                    resultMessage.classList.remove('correct');
+                    resultMessage.classList.add('wrong');
+                } else {
+                    resultMessage.textContent = "Even Steven! Your score didn't change this period.";
+                    resultMessage.classList.remove('correct', 'wrong');
+                }
+            } else {
+                resultMessage.textContent = "No bets placed this period.";
+                resultMessage.classList.remove('correct', 'wrong');
             }
-        });
 
-        // Start the game when the page loads
-        startGame();
-    </script>
-
-</body>
-</html>
+            // Store record for this period
+            addRecord({
+                period: currentPeriod,
+                actualColor: nextExpectedColor,
+                actualNumber: nextExpectedNumber,
+                bets: [...currentRoundBets], // Store a copy of bets made this round
+                sc

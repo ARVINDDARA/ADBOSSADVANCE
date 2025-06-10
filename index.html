@@ -3,506 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predict the Next Color & Number Game</title>
-
+    <title>ADBOSS Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f8ff; /* Alice Blue */
-            color: #333;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            line-height: 1.6;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #333;
         }
-        .game-container {
-            background-color: #ffffff;
+        #auth-container {
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: center;
-            max-width: 700px; /* Increased max-width */
-            width: 100%;
-            border: 1px solid #cce7e0;
-            position: relative;
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px; /* Space between auth and game */
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2.8em;
-        }
-        p {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        #score-display, #timer-display {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #007bff;
+        #auth-container h2 {
+            color: #0056b3;
             margin-bottom: 20px;
-        }
-        #timer-display {
-            color: #e67e22;
-        }
-        #color-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 7px solid #34495e;
-            margin: 30px auto;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.5);
-            transition: background-color 0.4s ease-in-out;
-            display: flex;
-            flex-direction: column; /* For color and number */
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            font-weight: bold;
-        }
-        #color-text {
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-        #number-text {
             font-size: 2em;
-            margin-top: 5px;
         }
-        .options-section {
-            margin-top: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .options-group {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .option-button {
-            background-color: #ecf0f1;
-            color: #34495e;
-            padding: 12px 25px;
-            border: 2px solid #3498db;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
-            min-width: 100px;
-            text-align: center;
-        }
-        .option-button.number-button {
-            min-width: 60px; /* Smaller for numbers */
-            padding: 10px 15px;
-        }
-        .option-button.selected { /* Added for visual feedback */
-            background-color: #3498db;
-            color: white;
-            border-color: #2980b9;
-        }
-        .option-button:hover:not(:disabled) {
-            background-color: #3498db;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.25);
-        }
-        .option-button:active:not(:disabled) {
-            transform: translateY(0);
-        }
-        .option-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #cccccc;
-            border-color: #999999;
-        }
-        .bet-input-group {
+        /* Google Sign-In Button Styling (Google's default styling is often used) */
+        .g_id_signin {
             margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
         }
-        .bet-input-group label {
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-        .bet-input-group input[type="number"] {
-            width: 100px;
-            padding: 8px 10px;
-            border: 2px solid #3498db;
-            border-radius: 8px;
-            font-size: 1.1em;
+
+        #game-container {
+            /* ... (Your existing #game-container styles) ... */
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: center;
-            -moz-appearance: textfield; /* Hide arrows for Firefox */
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
-        .bet-input-group input[type="number"]::-webkit-outer-spin-button,
-        .bet-input-group input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .bet-button {
-            background-color: #f39c12; /* Orange for bet */
+        /* ... (Rest of your existing CSS) ... */
+        #logout-btn {
+            background-color: #f44336; /* Red for logout */
             color: white;
             padding: 10px 20px;
+            border-radius: 8px;
             border: none;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
         }
-        .bet-button:hover:not(:disabled) {
-            background-color: #e67e22;
-            transform: translateY(-2px);
-        }
-        .bet-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #ccc;
-        }
-
-        #result-message {
-            margin-top: 30px;
-            font-size: 1.6em;
-            font-weight: bold;
-            min-height: 35px;
-            margin-bottom: 25px;
-        }
-        .correct {
-            color: #27ae60;
-        }
-        .wrong {
-            color: #e74c3c;
-        }
-        .game-over {
-            color: #c0392b;
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .records-section {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 2px dashed #ccc;
-            text-align: left;
-            width: 100%;
-        }
-        .records-section h2 {
-            text-align: center;
-            color: #34495e;
-            margin-bottom: 25px;
-            font-size: 2em;
-        }
-        #game-records {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #fdfdfd;
-        }
-        .record-item {
-            background-color: #e9f5f9;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95em;
-            border-left: 5px solid #3498db;
-        }
-        .record-item.correct-bet {
-            border-left-color: #27ae60;
-            background-color: #e6ffe6;
-        }
-        .record-item.wrong-bet {
-            border-left-color: #e74c3c;
-            background-color: #ffe6e6;
-        }
-        .record-item span {
-            font-weight: bold;
+        #logout-btn:hover {
+            background-color: #d32f2f;
         }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Predict the Next Color & Number!</h1>
-        <p>A color and number will change every 30 seconds. Predict the next one!</p>
-
-        <p id="timer-display">Next change in: 30s</p>
-        <p id="score-display">Score: 50</p>
-
-        <div id="color-circle">
-            <span id="color-text"></span>
-            <span id="number-text"></span>
+    <div id="auth-container">
+        <h2>Welcome to ADBOSS Prediction</h2>
+        <p>Sign in to save your progress and balance!</p>
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID" data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
         </div>
-
-        <div class="options-section">
-            <div class="options-group">
-                <button class="option-button" data-type="color" data-value="red">Red</button>
-                <button class="option-button" data-type="color" data-value="blue">Blue</button>
-                <button class="option-button" data-type="color" data-value="pink">Pink</button>
-            </div>
-            <div class="options-group">
-                <button class="option-button number-button" data-type="number" data-value="1">1</button>
-                <button class="option-button number-button" data-type="number" data-value="2">2</button>
-                <button class="option-button number-button" data-type="number" data-value="3">3</button>
-                <button class="option-button number-button" data-type="number" data-value="4">4</button>
-                <button class="option-button number-button" data-type="number" data-value="5">5</button>
-                <button class="option-button number-button" data-type="number" data-value="6">6</button>
-                <button class="option-button number-button" data-type="number" data-value="7">7</button>
-                <button class="option-button number-button" data-type="number" data-value="8">8</button>
-                <button class="option-button number-button" data-type="number" data-value="9">9</button>
-            </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
         </div>
-
-        <div class="bet-input-group">
-            <label for="bet-amount">Bet Points:</label>
-            <input type="number" id="bet-amount" value="10" min="1" max="50">
-            <button class="bet-button" id="place-bet-button">Place Bet</button>
-        </div>
-
-        <p id="result-message"></p>
+        <button id="logout-btn" style="display: none;">Logout</button>
     </div>
 
-    <div class="records-section">
-        <h2>Game Records</h2>
-        <div id="game-records">
-            <p>No records yet.</p>
+    <div id="game-container" style="display: none;"> <h1>ADBOSS PREDICTION</h1>
+        <div id="balance">Balance: ₹0</div> <div id="timer">30</div>
+        <div id="color-display">?</div>
+
+        <div class="betting-section">
+            <h2>Place Your Bet</h2>
+            <div class="bet-option">
+                <label for="color-select">Color:</label>
+                <select id="color-select">
+                    <option value="red">Red</option>
+                    <option value="green">Green</option>
+                    <option value="blue">Blue</option>
+                </select>
+            </div>
+            <div class="bet-option">
+                <label for="number-input">Number (1-10):</label>
+                <input type="number" id="number-input" min="1" max="10" placeholder="Enter number">
+            </div>
+            <div class="bet-option">
+                <label for="bet-amount">Amount:</label>
+                <input type="number" id="bet-amount" placeholder="Enter amount" min="1">
+            </div>
+            <button id="place-bet-btn">Place Bet</button>
+            <p id="bet-info" class="neutral">Place your bet!</p>
+        </div>
+
+        <div id="past-predictions">
+            <h2>Past Predictions</h2>
+            <ul id="predictions-list">
+            </ul>
         </div>
     </div>
 
     <script>
-        // Game configuration
-        const STARTING_POINTS = 50;
-        const POINTS_FOR_CORRECT_COLOR = 50;
-        const POINTS_FOR_PINK_BONUS = 100; // Total for Pink: 50 + 100 = 150
-        const POINTS_FOR_CORRECT_NUMBER = 1000;
-        const COLOR_CHANGE_INTERVAL_SECONDS = 30; // Color and number change every 30 seconds
+        const authContainer = document.getElementById('auth-container');
+        const gameContainer = document.getElementById('game-container');
+        const logoutBtn = document.getElementById('logout-btn');
 
-        // Color definitions
-        const COLORS = {
-            red: '#e74c3c',   // Alizarin Red
-            blue: '#3498db',  // Peter River Blue
-            pink: '#ff69b4'   // Hot Pink
-        };
-
-        // Game state variables
-        let score = STARTING_POINTS;
-        let timeLeftForNextChange = COLOR_CHANGE_INTERVAL_SECONDS;
-        let gameLoopInterval; // Interval for color/number changes
-        let timerCountdownInterval; // Interval for showing countdown
-        let currentPeriod = 0; // Tracks game periods
-
-        let currentDisplayedColor = null; // The color currently in the circle
-        let currentDisplayedNumber = null; // The number currently in the circle
-
-        let nextExpectedColor = null; // The color that will appear after 30 seconds
-        let nextExpectedNumber = null; // The number that will appear after 30 seconds
-
-        // Variables to store the user's *selected* prediction for the current bet
-        let selectedBetType = null; // 'color' or 'number'
-        let selectedBetValue = null; // e.g., 'red' or 5
-
-        // Array to store user's bets for the *current* round
-        let currentRoundBets = []; // { type: 'color'/'number', value: 'red'/5, amount: 10 }
-
-        // Array to store all game records
-        let gameRecords = []; // { period: 1, actualColor: 'red', actualNumber: 5, bets: [], scoreChange: +50 }
-
-        // DOM elements
-        const scoreDisplay = document.getElementById('score-display');
-        const timerDisplay = document.getElementById('timer-display');
-        const colorCircle = document.getElementById('color-circle');
-        const colorText = document.getElementById('color-text');
-        const numberText = document.getElementById('number-text');
-        const resultMessage = document.getElementById('result-message');
-        const gameRecordsContainer = document.getElementById('game-records');
-
-        const allOptionButtons = document.querySelectorAll('.option-button'); // All color and number buttons
-        const colorOptionButtons = document.querySelectorAll('.option-button[data-type="color"]');
-        const numberOptionButtons = document.querySelectorAll('.option-button[data-type="number"]');
+        const balanceDisplay = document.getElementById('balance');
+        const timerDisplay = document.getElementById('timer');
+        const colorDisplay = document.getElementById('color-display');
+        const colorSelect = document.getElementById('color-select');
+        const numberInput = document.getElementById('number-input');
         const betAmountInput = document.getElementById('bet-amount');
-        const placeBetButton = document.getElementById('place-bet-button');
+        const placeBetBtn = document.getElementById('place-bet-btn');
+        const betInfo = document.getElementById('bet-info');
+        const predictionsList = document.getElementById('predictions-list');
 
-        // --- Utility Functions ---
+        const colors = ['red', 'green', 'blue'];
+        const GREEN_RARITY_FACTOR = 0.2;
 
-        function updateDisplay() {
-            scoreDisplay.textContent = `Score: ${score}`;
-            timerDisplay.textContent = `Next change in: ${timeLeftForNextChange}s (Period ${currentPeriod})`;
-            betAmountInput.max = score; // Update max bet amount based on current score
-            // Ensure bet amount is not more than current score and not less than 1 (unless score is 0)
-            betAmountInput.value = Math.min(betAmountInput.value, score > 0 ? score : 0);
-            betAmountInput.value = Math.max(1, betAmountInput.value); // Ensure minimum bet is 1 unless score is 0
-            if (score <= 0 && currentPeriod > 0) { // Only end if game has actually started
-                endGame(); // End game if score drops to 0 or less
+        let countdown = 30;
+        let timerInterval;
+        let userBalance = 0; // Balance will be loaded from the server
+        let canBet = true;
+        let currentBet = {
+            color: null,
+            number: null,
+            amount: 0,
+            placed: false
+        };
+        let roundNumber = 0;
+
+        let userLoggedIn = false; // Flag to track login status
+        let userId = null; // Store user ID from backend
+
+        // --- Authentication Functions ---
+
+        // This function is called by Google's client library after a successful login
+        async function handleCredentialResponse(response) {
+            const id_token = response.credential;
+            console.log("Encoded ID Token: " + id_token);
+
+            try {
+                // Send the ID token to your backend for verification and user creation/lookup
+                const backendResponse = await fetch('/api/auth/google', { // Replace with your actual backend endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: id_token })
+                });
+
+                const data = await backendResponse.json();
+
+                if (data.success) {
+                    userLoggedIn = true;
+                    userId = data.userId; // Assuming your backend sends back a user ID
+                    userBalance = data.balance; // Load balance from backend
+                    roundNumber = data.lastRoundNumber || 0; // Load last round number
+
+                    authContainer.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                    logoutBtn.style.display = 'block';
+                    updateBalanceDisplay();
+                    fetchPastPredictions(); // Load user's past predictions
+                    startTimer();
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error during Google login:', error);
+                alert('An error occurred during login. Please try again.');
             }
         }
 
-        function enableBettingControls() {
-            betAmountInput.disabled = false;
-            placeBetButton.disabled = false; // Enable place bet button
-            allOptionButtons.forEach(button => button.disabled = false); // Enable all prediction buttons
+        logoutBtn.addEventListener('click', () => {
+            // Client-side logout (clears session, if any)
+            google.accounts.id.disableAutoSelect(); // Prevents auto-login on next visit
+            userLoggedIn = false;
+            userId = null;
+            userBalance = 0;
+            clearInterval(timerInterval); // Stop game timer
+
+            // Optionally, inform your backend to clear server-side session
+            // fetch('/api/auth/logout', { method: 'POST' }); // Example backend logout endpoint
+
+            authContainer.style.display = 'block';
+            gameContainer.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            predictionsList.innerHTML = ''; // Clear past predictions
+        });
+
+        // --- Game Logic (Modified for Backend Interaction) ---
+
+        function updateBalanceDisplay() {
+            balanceDisplay.textContent = `Balance: ₹${userBalance}`;
         }
 
-        function disableBettingControls() {
-            betAmountInput.disabled = true;
-            placeBetButton.disabled = true; // Disable place bet button
-            allOptionButtons.forEach(button => {
-                button.disabled = true;
-                button.classList.remove('selected'); // Remove selected visual on disable
-            });
-            selectedBetType = null; // Clear selected bet
-            selectedBetValue = null; // Clear selected bet
+        async function fetchPastPredictions() {
+             if (!userLoggedIn || !userId) return; // Only fetch if logged in
+
+             try {
+                 const response = await fetch(`/api/predictions/${userId}`); // Your backend endpoint
+                 const data = await response.json();
+                 if (data.success && Array.isArray(data.predictions)) {
+                     predictionsList.innerHTML = ''; // Clear existing
+                     data.predictions.forEach(p => addPredictionRecord(p.period, p.color, p.number, p.profit));
+                 }
+             } catch (error) {
+                 console.error('Error fetching past predictions:', error);
+             }
         }
 
-        function getRandomColorName() {
-            const randomNumber = Math.random();
-            if (randomNumber < 0.45) { // 45% chance for Red
-                return 'red';
-            } else if (randomNumber < 0.90) { // 45% chance for Blue (total 90%)
-                return 'blue';
-            } else { // 10% chance for Pink (rare)
-                return 'pink';
+        function updateTimer() {
+            timerDisplay.textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                canBet = false;
+
+                // Simulate the winning color and number generation (this would ideally come from the server)
+                const winningColor = changeColor();
+                const winningNumber = generateRandomNumber();
+                colorDisplay.textContent = winningNumber;
+
+                // Send winning details and current bet to backend for processing
+                processRoundOnServer(winningColor, winningNumber);
+
+                countdown = 30;
+                setTimeout(() => {
+                    canBet = true;
+                    startTimer();
+                }, 3000);
+            } else {
+                countdown--;
             }
         }
 
-        function getRandomNumber() {
-            return Math.floor(Math.random() * 9) + 1; // Random number between 1 and 9
+        function changeColor() {
+            let selectedColor;
+            const rand = Math.random();
+            if (rand < GREEN_RARITY_FACTOR) {
+                selectedColor = 'green';
+            } else if (rand < (GREEN_RARITY_FACTOR + (1 - GREEN_RARITY_FACTOR) / 2)) {
+                selectedColor = 'red';
+            } else {
+                selectedColor = 'blue';
+            }
+            colorDisplay.style.backgroundColor = selectedColor;
+            return selectedColor;
         }
 
-        function addRecord(record) {
-            gameRecords.push(record);
-            renderRecords();
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * 10) + 1;
         }
 
-        function renderRecords() {
-            gameRecordsContainer.innerHTML = ''; // Clear existing records
-            if (gameRecords.length === 0) {
-                gameRecordsContainer.innerHTML = '<p>No records yet.</p>';
+        function startTimer() {
+            roundNumber++;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            colorDisplay.textContent = '?';
+            colorDisplay.style.backgroundColor = 'grey';
+            betInfo.textContent = 'Place your bet!';
+            betInfo.className = 'neutral';
+            betAmountInput.value = '';
+            numberInput.value = '';
+            currentBet.placed = false;
+            currentBet.color = null;
+            currentBet.number = null;
+            currentBet.amount = 0;
+        }
+
+        async function processRoundOnServer(winningColor, winningNumber) {
+            if (!userLoggedIn || !userId) {
+                betInfo.textContent = "Please log in to play.";
+                betInfo.className = "lose";
                 return;
             }
 
-            // Iterate in reverse to show newest records at the top
-            for (let i = gameRecords.length - 1; i >= 0; i--) {
-                const record = gameRecords[i];
-                const recordItem = document.createElement('div');
-                recordItem.classList.add('record-item');
-
-                let betsSummary = '';
-                let betsMadeInRound = false;
-
-                record.bets.forEach(bet => {
-                    betsMadeInRound = true;
-                    if (bet.isCorrect) {
-                        betsSummary += `✔ ${bet.guessedValue.toString().toUpperCase()} (+${bet.pointsWon - bet.amount} net)`;
-                    } else {
-                        betsSummary += `❌ ${bet.guessedValue.toString().toUpperCase()} (-${bet.amount})`;
-                    }
-                    betsSummary += ' | ';
+            try {
+                const response = await fetch('/api/game/end-round', { // Your backend endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` // Assuming you store JWT
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        currentRound: roundNumber,
+                        winningColor: winningColor,
+                        winningNumber: winningNumber,
+                        userBet: currentBet.placed ? currentBet : null // Send the user's placed bet
+                    })
                 });
 
-                if (!betsMadeInRound) {
-                    betsSummary = 'No bets placed.';
-                    recordItem.classList.remove('correct-bet', 'wrong-bet'); // Ensure no specific color
-                } else if (record.scoreChange > 0) {
-                    recordItem.classList.add('correct-bet');
-                } else if (record.scoreChange < 0) {
-                    recordItem.classList.add('wrong-bet');
-                } else {
-                    recordItem.classList.remove('correct-bet', 'wrong-bet'); // Neutral if score change is 0
-                }
+                const data = await response.json();
 
-                recordItem.innerHTML = `
-                    <span>P${record.period}:</span>
-                    <span>Actual: ${record.actualColor.toUpperCase()} (${record.actualNumber})</span>
-                    <span>Bets: ${betsSummary || 'No bets'}</span>
-                    <span>Net: <span style="color:${record.scoreChange >= 0 ? '#27ae60' : '#e74c3c'}">${record.scoreChange >= 0 ? '+' : ''}${record.scoreChange}</span></span>
-                `;
-                gameRecordsContainer.appendChild(recordItem); // Add new records at the top
+                if (data.success) {
+                    userBalance = data.newBalance; // Update balance from backend
+                    updateBalanceDisplay();
+
+                    // Display result message based on backend's calculation
+                    const message = data.message;
+                    const resultClass = data.resultClass; // 'win', 'lose', 'neutral'
+                    betInfo.textContent = `The winning color was ${winningColor} and the number was ${winningNumber}. ${message}`;
+                    betInfo.className = resultClass;
+
+                    // Add prediction record based on backend's response
+                    addPredictionRecord(data.round, data.winningColor, data.winningNumber, data.profit);
+
+                } else {
+                    betInfo.textContent = 'Error processing round: ' + data.message;
+                    betInfo.className = 'lose';
+                }
+            } catch (error) {
+                console.error('Error sending round data to server:', error);
+                betInfo.textContent = 'An error occurred during the round. Please try again.';
+                betInfo.className = 'lose';
             }
         }
 
-        // --- Game Logic Functions ---
 
-        function checkBetsAndResolveRound() {
-            let roundScoreChange = 0;
-            let betsMadeInRound = false;
+        function addPredictionRecord(period, color, number, profit) {
+            const listItem = document.createElement('li');
+            const profitClass = profit > 0 ? 'profit-positive' : (profit < 0 ? 'profit-negative' : 'profit-neutral');
+            const profitText = profit > 0 ? `+₹${profit}` : (profit < 0 ? `-₹${Math.abs(profit)}` : `₹0`);
 
-            currentRoundBets.forEach(bet => {
-                betsMadeInRound = true;
-                
-                // Deduct bet amount when the round resolves
-                score -= bet.amount; 
+            listItem.innerHTML = `
+                <span>Period ${period}: <strong>${color.charAt(0).toUpperCase() + color.slice(1)}</strong> (${number})</span>
+                <span class="${profitClass}">Profit: ${profitText}</span>
+            `;
+            predictionsList.prepend(listItem);
+            if (predictionsList.children.length > 10) {
+                predictionsList.removeChild(predictionsList.lastChild);
+            }
+        }
 
-                let betOutcome = {
-                    type: bet.type,
-                    guessedValue: bet.guessedValue,
-                    amount: bet.amount,
-                    pointsWon: 0,
-                    isCorrect: false
-                };
-
-                if (bet.type === 'color') {
-                    if (bet.guessedValue === nextExpectedColor) {
-                        let pointsWon = POINTS_FOR_CORRECT_COLOR;
-                        if (nextExpectedColor === 'pink') {
-                            pointsWon += POINTS_FOR_PINK_BONUS;
-                        }
-                        score += pointsWon;
-                        roundScoreChange += (pointsWon - bet.amount);
-                        betOutcome.pointsWon = pointsWon;
-                        betOutcome.isCorrect = true;
-                    } else {
-                        roundScoreChange -= bet.amount; // Already deducted, so just track loss
-                    }
-                } else if (bet.type === 'number') {
-                    if (parseInt(bet.guessedValue) === nextExpectedNumber) {
-                        score += POINTS_FOR_CORRECT_NUMBER;
-                        roundScoreChange += (POINTS_FOR_CORRECT_NUMBER - bet.amount);
-                        betOutcome.pointsWon = POINTS_FOR_CORRECT_NUMBER;
-                        betOutcome.isCorrect = true;
-                    } else {
-                        roundScoreChange -= bet.amount; // Already deducted, so just track loss
-                    }
-                }
-                // Update the original bet object in currentRoundBets for the record
-                bet.isCorrect = betOutcome.isCorrect;
-                bet.pointsWon = betOutcome.pointsWon;
-            });
-
-            // Update result message based on round's bets
-            if (betsMadeInRound) {
-                if (roundScoreChange > 0) {
-                    resultMessage.textContent = `Well played! You gained ${roundScoreChange} points this period.`;
-                    resultMessage.classList.remove('wrong');
-                    resultMessage.classList.add('correct');
-                } else if (roundScoreChange < 0) {
-                    resultMessage.textContent = `Tough luck! You lost ${Math.abs(roundScoreChange)} points this period.`;
-                    resultMessage.classList.remove('correct');
-                    resultMessage.classList.add('wrong');
-                } else {
-                    resultMessage.textContent = "Even Steven! Your score didn't change this period.";
-                    resultMessage.classList.remove('correct', 'wrong');
-                }
-            } else {
-                resultMessage.textContent = "No bets placed this period.";
-                resultMessage.classList.remove('correct', 'wrong');
+        placeBetBtn.addEventListener('click', () => {
+            if (!userLoggedIn || !userId) {
+                betInfo.textContent = "Please log in to place a bet.";
+                betInfo.className = "lose";
+                return;
             }
 
-            // Store record for this period
-            addRecord({
-                period: currentPeriod,
-                actualColor: nextExpectedColor,
-                actualNumber: nextExpectedNumber,
-                bets: [...currentRoundBets], // Store a copy of bets made this round
-                sc
+            if (canBet) {
+                const betAmount = parseInt(betAmountInput.value);
+                const betNumber = parseInt(numberInput.value);
+                const betColor = colorSelect.value;
+
+                if (isNaN(betAmount) || betAmount <= 0) {
+                    betInfo.textContent = 'Please enter a valid bet amount greater than 0.';
+                    betInfo.className = 'lose';
+                    return;
+                }
+                if (betAmount > userBalance) {
+                    betInfo.textContent = 'Insufficient balance to place this bet.';
+                    betInfo.className = 'lose';
+                    return;
+                }
+
+                // IMPORTANT: In a real game, you would send this bet to the server
+                // The server would validate it, deduct the amount, and store the bet
+                // for the current round.
+                // For this conceptual example, we're still processing it locally but
+                // a real game would have server-side betting to prevent cheating.
+
+                betInfo.textContent = `Bet placed on ${betColor} ${isNaN(betNumber) ? '' : `and number ${betNumber}`} for ₹${betAmount}. Waiting for the round to end...`;
+                betInfo.className = 'neutral';
+                currentBet.color = betColor;
+                currentBet.number = isNaN(betNumber) ? null : betNumber;
+                currentBet.amount = betAmount;
+                currentBet.placed = true;
+                userBalance -= betAmount; // Deduct immediately, then adjust based on win/loss from server
+                updateBalanceDisplay();
+                canBet = false; // Disable betting immediately after placing a bet for the current round
+            } else {
+                betInfo.textContent = 'Please wait for the current round to finish before placing a new bet.';
+                betInfo.className = 'neutral';
+            }
+        });
+
+        // Initial state: hide game, show auth
+        authContainer.style.display = 'block';
+        gameContainer.style.display = 'none';
+
+        // NOTE: The game's timer should only start *after* a successful login and data load.
+        // It's currently in startTimer(), which is called after successful login.
+    </script>
+</body>
+</html>

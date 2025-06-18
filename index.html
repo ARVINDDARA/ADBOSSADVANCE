@@ -44,7 +44,7 @@
             color: #a2f2a2;
         }
 
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             width: calc(100% - 20px);
             padding: 10px;
             margin-bottom: 15px;
@@ -145,13 +145,12 @@
             color: white;
         }
 
-        /* Style for the profit message */
         #profitMessage {
             font-size: 1.6em;
             font-weight: bold;
-            color: #a2f2a2; /* Greenish color for profit */
+            color: #a2f2a2;
             margin-top: 20px;
-            animation: fadeInOut 3s forwards; /* Animation to fade in and out */
+            animation: fadeInOut 3s forwards;
         }
 
         @keyframes fadeInOut {
@@ -159,6 +158,43 @@
             20% { opacity: 1; transform: translateY(0); }
             80% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Styles for Withdrawal Section */
+        #withdrawalSection {
+            background-color: #2f343a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid #444;
+        }
+
+        #withdrawalSection h2 {
+            color: #a2f2a2;
+            margin-bottom: 15px;
+        }
+
+        #withdrawalHistoryBox {
+            background-color: #3a3f47;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px dashed #61dafb;
+            text-align: left;
+            min-height: 80px;
+        }
+
+        #withdrawalHistoryBox p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        #withdrawalHistoryBox .success-message {
+            font-weight: bold;
+            color: #a2f2a2;
+            font-size: 1.1em;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -174,7 +210,7 @@
             <p>Kitne rupees ki bet lagana chahte hain?</p>
             <input type="number" id="betInput" min="1" value="10">
             <button id="placeBetBtn">Bet Lagao</button>
-        </div>
+            <button id="showWithdrawalBtn">Withdraw</button> </div>
 
         <div id="gameplaySection" class="hidden">
             <p id="airplaneDisplay">✈️</p>
@@ -184,7 +220,22 @@
         </div>
 
         <div id="gameMessages"></div>
-        <div id="profitMessage" class="hidden"></div> </div>
+        <div id="profitMessage" class="hidden"></div>
+
+        <div id="withdrawalSection" class="hidden">
+            <h2>Withdraw Funds</h2>
+            <p>Kitna withdrawal karna chahte hain?</p>
+            <input type="number" id="withdrawAmountInput" min="1">
+            <p>Apni UPI ID enter karein:</p>
+            <input type="text" id="upiIdInput" placeholder="yourname@upi" value="">
+            <button id="submitWithdrawalBtn">Withdraw Now</button>
+            <button id="cancelWithdrawalBtn">Cancel</button>
+        </div>
+
+        <div id="withdrawalHistoryBox">
+            <p>Withdrawal History:</p>
+            </div>
+    </div>
 
     <script>
         let balance = 100;
@@ -194,12 +245,10 @@
         let gameInterval;
         const multiplierHistory = [];
 
-        // Sound elements
-        // For real deployment, host these files locally!
+        // Sound elements (use relative paths if hosting locally)
         const takeOffSound = new Audio('https://www.soundjay.com/transport/airplane-take-off-1.mp3'); 
         const cashOutSound = new Audio('https://www.soundjay.com/misc/collect-sound-2.mp3');
         const crashSound = new Audio('https://www.soundjay.com/misc/pop-sound.mp3');
-
 
         const balanceSpan = document.getElementById('balance');
         const betInput = document.getElementById('betInput');
@@ -211,19 +260,30 @@
         const gameplaySection = document.getElementById('gameplaySection');
         const airplaneDisplay = document.getElementById('airplaneDisplay');
         const multiplierHistoryDiv = document.getElementById('multiplierHistory');
-        const profitMessageDiv = document.getElementById('profitMessage'); // Getting the profit message element again
+        const profitMessageDiv = document.getElementById('profitMessage');
+
+        // New Withdrawal Elements
+        const showWithdrawalBtn = document.getElementById('showWithdrawalBtn');
+        const withdrawalSection = document.getElementById('withdrawalSection');
+        const withdrawAmountInput = document.getElementById('withdrawAmountInput');
+        const upiIdInput = document.getElementById('upiIdInput');
+        const submitWithdrawalBtn = document.getElementById('submitWithdrawalBtn');
+        const cancelWithdrawalBtn = document.getElementById('cancelWithdrawalBtn');
+        const withdrawalHistoryBox = document.getElementById('withdrawalHistoryBox');
 
         function updateUI() {
             balanceSpan.textContent = balance.toFixed(2);
             betInput.max = balance;
             betInput.value = Math.min(betInput.value, balance);
             placeBetBtn.disabled = balance <= 0;
+            showWithdrawalBtn.disabled = balance <= 0; // Disable withdraw if no balance
             if (balance <= 0) {
                 logMessage("Aapka balance khatam ho gaya hai. Game Over!", true);
                 bettingSection.classList.remove('hidden');
                 gameplaySection.classList.add('hidden');
                 clearInterval(gameInterval);
             }
+            withdrawAmountInput.max = balance; // Max withdrawal amount is current balance
         }
 
         function logMessage(message, isImportant = false) {
@@ -240,7 +300,6 @@
         }
 
         function displayProfitMessage(winnings) {
-            // Modified this line to remove "PEHLE JO PROFIT HUA H"
             profitMessageDiv.textContent = `₹${winnings.toFixed(2)} FROM ARVIND DARA ADBOSS`;
             profitMessageDiv.classList.remove('hidden');
             setTimeout(() => {
@@ -324,7 +383,54 @@
             updateUI();
         }
 
-        // Event Listeners
+        // --- Withdrawal Functions ---
+        function showWithdrawalForm() {
+            bettingSection.classList.add('hidden');
+            withdrawalSection.classList.remove('hidden');
+            withdrawAmountInput.value = balance.toFixed(2); // Pre-fill with max balance
+            withdrawAmountInput.focus();
+        }
+
+        function hideWithdrawalForm() {
+            bettingSection.classList.remove('hidden');
+            withdrawalSection.classList.add('hidden');
+        }
+
+        function processWithdrawal() {
+            const withdrawAmount = parseFloat(withdrawAmountInput.value);
+            const upiId = upiIdInput.value.trim();
+
+            if (isNaN(withdrawAmount) || withdrawAmount <= 0 || withdrawAmount > balance) {
+                logMessage(`Invalid withdrawal amount. Kripya 1 aur ${balance.toFixed(2)} ke beech mein amount enter karein.`, true);
+                return;
+            }
+
+            if (upiId === "") {
+                logMessage("Kripya apni UPI ID enter karein.", true);
+                return;
+            }
+
+            balance -= withdrawAmount;
+            updateUI();
+            hideWithdrawalForm();
+
+            // Log withdrawal to the permanent history box
+            const withdrawEntry = document.createElement('p');
+            withdrawEntry.innerHTML = `UPI ID: <strong>${upiId}</strong>, Amount: <strong>₹${withdrawAmount.toFixed(2)}</strong>`;
+            
+            const successMsg = document.createElement('p');
+            successMsg.classList.add('success-message');
+            successMsg.innerHTML = `Congratulations 🎉 your money 🤑 arrived soon from :- adboss29🗿`;
+
+            // Clear previous entries and add new ones (optional, can append if you want a long list)
+            withdrawalHistoryBox.innerHTML = '<p>Withdrawal History:</p>'; // Keep the header
+            withdrawalHistoryBox.appendChild(withdrawEntry);
+            withdrawalHistoryBox.appendChild(successMsg);
+            
+            logMessage(`Aapne ₹${withdrawAmount.toFixed(2)} withdraw kiye hain.`, true);
+        }
+
+        // --- Event Listeners ---
         placeBetBtn.addEventListener('click', () => {
             const bet = parseInt(betInput.value);
 
@@ -339,6 +445,7 @@
             
             bettingSection.classList.add('hidden');
             gameplaySection.classList.remove('hidden');
+            showWithdrawalBtn.disabled = true; // Disable withdraw button during gameplay
             
             updateUI();
             startGame();
@@ -351,10 +458,16 @@
             logMessage(`Badhai ho! Aapne ${currentMultiplier.toFixed(2)}x par cash out kiya aur ₹${winnings.toFixed(2)} jeete!`, true);
             airplaneDisplay.style.animationPlayState = 'paused';
             cashOutSound.play().catch(e => console.log("Sound play error:", e));
-            displayProfitMessage(winnings); // Call to display the profit message
+            displayProfitMessage(winnings);
             updateMultiplierHistory(currentMultiplier, true);
             endRound();
+            showWithdrawalBtn.disabled = false; // Re-enable withdraw button after round
         });
+
+        showWithdrawalBtn.addEventListener('click', showWithdrawalForm);
+        submitWithdrawalBtn.addEventListener('click', processWithdrawal);
+        cancelWithdrawalBtn.addEventListener('click', hideWithdrawalForm);
+
 
         // Initial UI update
         updateUI();
